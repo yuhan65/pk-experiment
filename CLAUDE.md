@@ -32,7 +32,9 @@ docs/
 ├── Logic/                 # one note per product-logic rule
 ├── Decisions/             # ADRs — numbered, never deleted
 ├── Journal/               # one note per session: YYYY-MM-DD-<slug>.md
-├── Templates/             # Logic.md, Decision.md, Journal.md — READ-ONLY
+├── Daily/                 # daily plans (operational): YYYY-MM-DD.md
+├── Templates/             # Logic.md, Decision.md, Journal.md, Daily.md — READ-ONLY
+├── note for myself.md     # the raw inbox — user appends freeform thoughts here
 └── Peako_*.md             # legacy long-form — link, don't fragment
 ```
 
@@ -49,8 +51,12 @@ I do **not** auto-log on every turn. I log when the user says one of these:
 | `归档` / `归一下` / `整理到 obsidian` / `更新 obsidian` | 中文 | Full archive workflow |
 | `obs` / `obs it` / `update obsidian` / `write a journal entry` | English | Full archive workflow |
 | `扫一下 <file>` / `extract logic from <file>` | mixed | Scan code → extract Logic notes |
+| `morning` / `plan` / `report` / `plan today` | English | Generate today's daily plan |
+| `晨报` / `今日计划` / `安排今天` | 中文 | Generate today's daily plan |
 
 **CRITICAL gotcha:** the bare word `log` is **NOT a trigger**. It's a product feature (Log Salad / Log Pizza / Log Gym). If the user says "log this decision" — that's a request to *record* something; it's not the `obs` trigger. Only the shortcuts above count.
+
+**Trigger disambiguation for `plan` / `report`:** these are generic English words. Only treat them as triggers when they stand alone or paired with `today` / `for today` / `me`. "Let me plan the next feature" is NOT a trigger. "plan" / "plan today" / "morning plan please" IS.
 
 Between triggers, I just work. No archiving on every response.
 
@@ -68,6 +74,28 @@ Between triggers, I just work. No archiving on every response.
 5. **Write one Journal entry** `docs/Journal/YYYY-MM-DD-<kebab-slug>.md` using `Templates/Journal.md`. Use `participants: [me, claude-design]`. Slug describes session focus. Same-day sessions from different AIs differentiate by slug (e.g. `2026-04-24-cursor-streak-refactor.md` vs `2026-04-24-design-feed-redesign.md`). **Never append `-1`/`-2`.**
 6. **Commit + push.** Commit message: `docs(obsidian): <session focus> [claude-design]`.
 7. **Report back** to the user: list of files created/modified with one-line reasons.
+
+---
+
+## Daily-plan workflow (on morning / plan / report / 晨报)
+
+1. **Read inputs in this order:**
+   - `docs/note for myself.md` — the raw inbox (primary input)
+   - Most recent `docs/Daily/*.md` — yesterday's plan for carryover
+   - 3 most recent `docs/Journal/*.md` — for session context
+   - `docs/Peako_Open_Decisions.md` — existing open product calls
+   - `git log --since="2 days ago" --oneline` — what changed while the user was away
+2. **Classify** every inbox entry into: `decision-needed` / `design-task` / `code-task` / `research-question` / `deferred` / `status-update` / `done`.
+3. **Prioritize:**
+   - **Top 3** = highest (urgency × user-value × unblocks-others). Never more than 3. Each cites its source.
+   - **Secondary** = everything else actionable today.
+   - **Open questions → candidate ADRs** = `decision-needed` items. Name the expected ADR number (current max + 1 — `git pull` first).
+   - **Stale** = inbox items ≥ 7 days old, no movement. Suggest defer / escalate / close.
+   - **Carryover** = yesterday's top-3 not marked done. Demote to Secondary after 3 days of rolling over.
+4. **Cross-link.** If an inbox item matches an existing `Logic/` or `Decisions/` note, link rather than duplicate.
+5. **Write the file.** Path: `docs/Daily/YYYY-MM-DD.md` (or `-afternoon` etc. if today's file exists). Use `Templates/Daily.md`. Set `author: claude-design`.
+6. **Report back in chat.** Top 3 as bullets (≤ 1 line each), plus counts of secondary / open-question / stale items, plus a link to the generated file. Do NOT paste the full file.
+7. **Do NOT:** modify `note for myself.md` (user curates), create Logic/Decision notes as a side effect (that's `obs`), or commit/push (user decides).
 
 ---
 

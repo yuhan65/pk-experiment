@@ -14,7 +14,13 @@ The folder `docs/` is an Obsidian Vault. When the user says any of the following
 **Triggers for "scan code and extract logic":**
 - "扫一下 `<file>`", "extract logic from `<file>`", "拆 `<file>` 的逻辑到 Logic"
 
+**Triggers for "generate today's daily plan" (morning report from the inbox):**
+- English: **"morning"**, **"plan"**, **"report"**, "plan today"
+- Chinese: **"晨报"**, "今日计划", "安排今天"
+
 Note: do NOT interpret the word **"log"** (English) as a trigger — it's a first-class feature name in this app (Log Salad / Log Pizza / Log Gym) and means something entirely different. Only the shortcuts listed above count.
+
+Trigger word disambiguation: `plan` and `report` are generic English words. Only treat them as triggers when they stand alone or with `today`/`for today`/`me`. A sentence like "let me plan the next feature" is NOT a trigger; "plan" / "plan today" / "morning plan please" IS.
 
 ## Folder map
 
@@ -24,7 +30,9 @@ docs/
 ├── Logic/                 # one note per product-logic rule (the core of the vault)
 ├── Decisions/             # ADRs — one note per hard call
 ├── Journal/               # one note per Cursor session, named YYYY-MM-DD-<slug>.md
-├── Templates/             # Logic.md, Decision.md, Journal.md — copy these, never edit
+├── Daily/                 # daily plans (operational, not conceptual) — YYYY-MM-DD.md
+├── Templates/             # Logic.md, Decision.md, Journal.md, Daily.md — copy these, never edit
+├── note for myself.md     # the raw inbox — user appends freeform thoughts here
 └── Peako_*.md             # legacy long-form docs; link but don't fragment
                            # co-owned: cursor edits rarely, claude-design edits Peako_Design_Brief.md
 ```
@@ -98,6 +106,48 @@ When asked to scan code and extract logic:
 4. For each, fill in *Why* by inferring user-facing impact; if uncertain, write `TODO: confirm with PM` and leave `status: draft`.
 5. Cross-link: if two logics share inputs/outputs, add each to the other's `Depends on / Affects`.
 6. End with a Journal entry summarizing what was extracted.
+
+## The "daily plan" workflow
+
+When asked for a `morning` / `plan` / `report` / `晨报`:
+
+### 1. Read these inputs, in this order
+1. `docs/note for myself.md` — the raw inbox. This is the primary input.
+2. The most recent file in `docs/Daily/` (yesterday's plan, if any) — for carryover.
+3. The 3 most recent `docs/Journal/*.md` — for recent-session context.
+4. `docs/Peako_Open_Decisions.md` — to cross-reference open product calls.
+5. `git log --since="2 days ago" --oneline` — to see what changed while the user was away (possibly from the other AI).
+
+### 2. Classify every inbox entry into one bucket
+- `decision-needed` — a hard call that deserves an ADR
+- `design-task` — visual/interaction work (likely for claude-design to own)
+- `code-task` — implementation work (likely for cursor to own)
+- `research-question` — needs more info before it's actionable
+- `deferred` — entry explicitly says 之后 / later / 放到后面
+- `status-update` — just a note about progress, no action needed
+- `done` — already accomplished, can be archived
+
+### 3. Prioritize
+- **Top 3** = the three items with the highest combination of (urgency × user-value × unblocks-others). Never more than 3. Each must cite its source (which inbox entry, which Journal thread, which open decision).
+- **Secondary** = everything else that's actionable today.
+- **Open questions → candidate ADRs** = `decision-needed` items. Name the expected ADR number (current max + 1).
+- **Stale** = inbox items ≥ 7 days old with no movement. Suggest defer / escalate / close.
+- **Carryover** = yesterday's top-3 items not marked done. If they've carried ≥ 3 days, demote to Secondary and flag.
+
+### 4. Cross-link aggressively
+- If an inbox item matches an existing `Logic/` or `Decisions/` note, link it rather than duplicating context.
+- If it's a candidate ADR, name the slug you'd use.
+
+### 5. Write the file
+Path: `docs/Daily/YYYY-MM-DD.md` (or `YYYY-MM-DD-<slot>.md` if the file already exists — e.g. `-afternoon`). Use `Templates/Daily.md`. Set `author:` to `cursor` or `claude-design`.
+
+### 6. Report back in chat
+Summarize the **Top 3** (bullets, ≤ 1 line each) and the count of secondary / open-question / stale items. Link the generated file. Do NOT paste the full file into chat — the user reads it in Obsidian.
+
+### 7. Do NOT
+- Do NOT modify `docs/note for myself.md`. The user curates that manually.
+- Do NOT create Logic/Decision notes as a side effect of the plan. That's the `obs` workflow. The daily plan only *suggests* which entries deserve to become ADRs.
+- Do NOT commit/push. The user decides when.
 
 ## Examples of well-scoped Logic notes
 

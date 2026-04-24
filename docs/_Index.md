@@ -66,6 +66,18 @@ LIMIT 10
 
 ---
 
+## Recent daily plans
+
+```dataview
+TABLE date, author, length(file.tasks) AS "open tasks"
+FROM "Daily"
+WHERE type = "daily-plan"
+SORT date DESC
+LIMIT 7
+```
+
+---
+
 ## All open questions across Logic notes
 
 ```dataview
