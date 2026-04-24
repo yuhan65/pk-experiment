@@ -26,6 +26,7 @@ docs/
 ├── Journal/               # one note per Cursor session, named YYYY-MM-DD-<slug>.md
 ├── Templates/             # Logic.md, Decision.md, Journal.md — copy these, never edit
 └── Peako_*.md             # legacy long-form docs; link but don't fragment
+                           # co-owned: cursor edits rarely, claude-design edits Peako_Design_Brief.md
 ```
 
 ## Writing rules
@@ -62,6 +63,20 @@ The journal MUST:
 - `docs/_Index.md` — only add links when a whole new folder/category appears. Dataview queries update automatically.
 - `docs/Templates/*` — templates are read-only references; copy them, don't edit in place.
 - Legacy `docs/Peako_*.md` — preserve as-is; new info goes into `Logic/` / `Decisions/` and links back.
+
+## Co-authoring with the design AI
+
+A second AI (Claude, in a separate design tool at a different workstation) also writes to this vault via git pull/push. Coexistence rules:
+
+- **Append, never rewrite.** When updating a Logic or Decision note, only modify sections you authored in this session. Do not reorganize, reformat, or collapse prior entries regardless of author.
+- **Author marker in frontmatter.** Journal entries use `participants: [me, cursor]` or `participants: [me, claude-design]` depending on who ran the session. Never merge two authors into one Journal file — each session is one file, one author.
+- **Changelog lines include author tag.** In Logic-note `## Changelog` sections and Decision-note amendments, prefix your line with `[cursor]` or `[claude-design]`:
+  - `- 2026-04-24 [cursor] — locked rule after ADR-009`
+  - `- 2026-04-24 [claude-design] — updated Code/UI anchors after screen redesign`
+- **ADR numbers are a shared sequence.** Before creating a new ADR, `git pull`, then check the highest existing `ADR-<n>` in `Decisions/` and use `n+1`. If you hit a collision on push, the loser renames to `n+2` and updates inbound wikilinks.
+- **Journal filenames must not collide.** Same-day sessions from different authors differentiate via slug, e.g. `2026-04-24-cursor-streak-refactor.md` and `2026-04-24-design-feed-redesign.md`. Never append `-1` / `-2`.
+- **Don't touch each other's scope without a handoff.** Cursor owns `src/` logic extraction; the design AI owns `Peako_Design_Brief.md` and screen-level anchors inside Logic notes. If you need to edit the other's territory, leave a `TODO: handoff to <other>` in the relevant section and surface it in the Journal's *Open threads*.
+- **Trigger words apply to whoever is in session.** If the user says `归档` / `obs` to the design AI, it runs the workflow there; Cursor picks up the Journal entry on next pull. Don't re-run the archive on pull — it's already been archived.
 
 ## The "整理到 obsidian" workflow
 
