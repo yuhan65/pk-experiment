@@ -1,18 +1,89 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Peako — Prototype</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>peako</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800&family=Nunito:wght@600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles/peako.css">
+
+<style>
+  html, body { height: 100%; margin: 0; background: #0e0c0a; }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100dvh;
+    overflow: hidden;
+  }
+  #app-root {
+    position: relative;
+    width: 390px;
+    height: 844px;
+    max-width: 100vw;
+    max-height: 100dvh;
+    background: var(--bg, #0e0c0a);
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, .25), 0 40px 80px rgba(0, 0, 0, .18);
+  }
+  @media (max-width: 430px) {
+    #app-root {
+      width: 100vw;
+      height: 100dvh;
+      box-shadow: none;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="app-root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="frames/ios-frame.jsx"></script>
+<script type="text/babel" src="components/mascot.jsx"></script>
+<script type="text/babel" src="components/ui.jsx"></script>
+<script type="text/babel" src="components/feed.jsx"></script>
+<script type="text/babel" src="components/today.jsx"></script>
+<script type="text/babel" src="components/progress.jsx"></script>
+<script type="text/babel" src="components/you.jsx"></script>
+
+<script>
+  window.PEAKO_TWEAKS = {
+    "dayState": "fresh",
+    "mood": "deadpan",
+    "growthDay": 7,
+    "idleVariant": "gorogoro"
+  };
+</script>
+
+<script type="text/babel">
+const { useState } = React;
+
+function PeakoApp({ tweaks }) {
+  const [tab, setTab] = useState('today');
+  return (
+    <div style={{ position: 'absolute', inset: 0, background: 'var(--bg)', overflow: 'hidden' }}>
+      <IOSStatusBar time="9:41" />
+      <div style={{ position: 'absolute', top: 54, left: 0, right: 0, bottom: 0 }}>
+        {tab === 'today'    && <TodayScreen dayState={tweaks.dayState} mood={tweaks.mood} growthDay={tweaks.growthDay} idleVariant={tweaks.idleVariant}/>}
+        {tab === 'progress' && <ProgressScreen growthDay={tweaks.growthDay}/>}
+        {tab === 'you'      && <YouScreen growthDay={tweaks.growthDay}/>}
+      </div>
+      <PeakoTabBar tab={tab} onTab={setTab} />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('app-root')).render(<PeakoApp tweaks={window.PEAKO_TWEAKS}/>);
+</script>
+
+</body>
 </html>

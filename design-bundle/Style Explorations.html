@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>peako — style explorations</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&family=Quicksand:wght@500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,500;1,9..144,600;1,9..144,700;1,9..144,800&family=Inter:wght@400;500;600;700;800&family=VT323&display=swap" rel="stylesheet">
+
+<style>
+  html, body { height: 100%; margin: 0; background: #14110d; }
+  body { overflow: hidden; }
+  #canvas-root { width: 100vw; height: 100vh; }
+  .hide-scroll::-webkit-scrollbar { display: none; }
+</style>
+</head>
+<body>
+
+<div id="canvas-root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="frames/ios-frame.jsx"></script>
+<script type="text/babel" src="frames/design-canvas.jsx"></script>
+<script type="text/babel" src="style-explorations.jsx"></script>
+
+<script type="text/babel">
+function Phone({ children }) {
+  return (
+    <IOSDevice style={{ boxShadow: '0 20px 40px rgba(0,0,0,.25), 0 40px 80px rgba(0,0,0,.18)' }}>
+      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+        <IOSStatusBar time="9:41"/>
+        <div style={{ position: 'absolute', top: 54, left: 0, right: 0, bottom: 0 }}>
+          {children}
+        </div>
+      </div>
+    </IOSDevice>
+  );
+}
+
+function StyleCard({ s, screen }) {
+  return (
+    <Phone>
+      <window.ScreenWithTabs StyleCmp={s.Cmp} screen={screen}
+        tabBg={s.tab.bg} tabFg={s.tab.fg} tabAccent={s.tab.accent} tabBorder={s.tab.border}/>
+    </Phone>
+  );
+}
+
+function Intro() {
+  return (
+    <div style={{
+      position: 'absolute', inset: 0, padding: 24, overflow: 'auto',
+      background: '#fff', color: '#1a1a1a',
+      fontFamily: "'Inter', system-ui, sans-serif",
+    }}>
+      <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: '.18em', color: '#888' }}>STYLE EXPLORATIONS</div>
+      <div style={{ fontSize: 30, fontWeight: 800, letterSpacing: '-.02em', marginTop: 4, lineHeight: 1.1 }}>
+        Fun, vivid, readable.<br/>Six directions.
+      </div>
+      <div style={{ fontSize: 14, color: '#555', marginTop: 12, lineHeight: 1.5 }}>
+        Each row = one visual language rendered on the <b>Progress</b> tab and the <b>You</b> tab.
+        Content is placeholder — the point is color, type, shape, density, mood.
+        Pick favorites, mix pieces, or tell me to push any further.
+      </div>
+      <ol style={{ marginTop: 14, paddingLeft: 18, fontSize: 13.5, lineHeight: 1.7, color: '#333' }}>
+        <li><b>Duolingo-style</b> — chunky, gamey, saturated green</li>
+        <li><b>Neobrutalist pop</b> — hard borders, color blocks, offset shadows</li>
+        <li><b>Clay / 3D soft</b> — pillowy gradients, glass, pastel</li>
+        <li><b>Retro arcade</b> — CRT dark, neon, pixel, scanlines</li>
+        <li><b>Zine / risograph</b> — cream paper, 2-ink, serif italics, grain</li>
+        <li><b>Kawaii bubblegum</b> — pastel pink/mint, dashed, stickers</li>
+      </ol>
+    </div>
+  );
+}
+
+function Root() {
+  return (
+    <DesignCanvas>
+      <DCSection id="intro" title="OVERVIEW" subtitle="Six distinct visual languages. Progress tab + You tab each.">
+        <DCArtboard id="overview" label="What's here" width={420} height={540}>
+          <Intro/>
+        </DCArtboard>
+      </DCSection>
+
+      {window.STYLES.map((s, i) => (
+        <DCSection key={s.id} id={s.id} title={`${String(i+1).padStart(2,'0')} · ${s.name.toUpperCase()}`} subtitle={s.desc}>
+          <DCArtboard id={`${s.id}-progress`} label={`${s.name} · Progress`} width={390} height={844}>
+            <StyleCard s={s} screen="progress"/>
+          </DCArtboard>
+          <DCArtboard id={`${s.id}-you`} label={`${s.name} · You`} width={390} height={844}>
+            <StyleCard s={s} screen="you"/>
+          </DCArtboard>
+        </DCSection>
+      ))}
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('canvas-root')).render(<Root/>);
+</script>
+</body>
+</html>

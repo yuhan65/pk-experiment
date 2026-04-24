@@ -1,0 +1,223 @@
+/* ═══════════════════════════════════════════════════════════════
+   PEAKO — visual system
+   Mix: soft-toy (squish, depth) × playful-mono (labels) ×
+   sticker-pack (thick outlines, hi-sat accent) × riso (grain)
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Palette A — "Peako OG" (default): cream + sage + cherry */
+  --bg:        #f7f2e8;
+  --bg-2:     #efe8d8;
+  --ink:       #1f1d1b;
+  --ink-2:    #55504a;
+  --ink-3:    #8f897e;
+  --paper:    #ffffff;
+  --line:     #1f1d1b;
+  --hairline: rgba(31,29,27,.12);
+
+  --hi:        #8bd48f;   /* primary — sage-mint */
+  --hi-deep:  #3aa053;
+  --accent:    #ff6068;   /* cherry */
+  --accent-2: #ffc266;   /* marigold */
+  --cool:      #7fb6ff;   /* sky */
+  --plum:      #c28bff;
+  --rest:      #dcd7c8;
+
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-xl: 30px;
+
+  /* Drop shadows — softer, not stamp-offset */
+  --sh-1: 0 1px 2px rgba(31,29,27,.06), 0 2px 6px rgba(31,29,27,.04);
+  --sh-2: 0 2px 4px rgba(31,29,27,.08), 0 8px 16px rgba(31,29,27,.06);
+  --sh-3: 0 4px 10px rgba(31,29,27,.10), 0 18px 40px rgba(31,29,27,.10);
+
+  /* Kept for accents where we want the toy offset feel */
+  --sq-1: 0 2px 0 var(--line);
+  --sq-2: 0 3px 0 var(--line);
+  --sq-3: 0 4px 0 var(--line);
+
+  --font-display: 'Fraunces', 'Recoleta', Georgia, serif;
+  --font-ui:      'Nunito', 'SF Pro Rounded', -apple-system, system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+/* Palette B — "Midnight Gummy" */
+[data-palette="midnight"] {
+  --bg: #14131a;
+  --bg-2: #1d1b26;
+  --ink: #fff7e8;
+  --ink-2: #cec5b3;
+  --ink-3: #7a7487;
+  --paper: #201e2a;
+  --line: #fff7e8;
+  --hi: #c3ff4f;
+  --hi-deep: #8adb00;
+  --accent: #ff4d9d;
+  --accent-2: #ffb648;
+  --cool: #7ab8ff;
+  --plum: #c58bff;
+  --rest: #3a3648;
+}
+
+/* Palette C — "Riso Duo" (cream + tomato + ink) */
+[data-palette="riso"] {
+  --bg: #f0e7d2;
+  --bg-2: #e6dcc4;
+  --ink: #1a1a1a;
+  --ink-2: #3a3832;
+  --ink-3: #7a7668;
+  --paper: #f8f2e0;
+  --line: #1a1a1a;
+  --hi: #ff5a3c;
+  --hi-deep: #c63a1f;
+  --accent: #1c3a8c;
+  --accent-2: #ffc94a;
+  --cool: #1c3a8c;
+  --plum: #7a4bff;
+  --rest: #cfc6b1;
+}
+
+/* ─────────────────── base ─────────────────── */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Grain overlay — riso texture, universally applied */
+.grain::after {
+  content: '';
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(rgba(0,0,0,.18) 1px, transparent 1px),
+    radial-gradient(rgba(0,0,0,.12) 1px, transparent 1px);
+  background-size: 3px 3px, 7px 7px;
+  background-position: 0 0, 1px 2px;
+  mix-blend-mode: multiply;
+  opacity: .22;
+  border-radius: inherit;
+}
+
+[data-palette="midnight"] .grain::after { mix-blend-mode: screen; opacity: .1; }
+
+/* ─────────────────── type utilities ─────────────────── */
+.t-mono { font-family: var(--font-mono); letter-spacing: .02em; }
+.t-display { font-family: var(--font-display); font-weight: 600; letter-spacing: -.02em; line-height: .95; }
+.t-label { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
+.t-tiny  { font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+
+/* ─────────────────── building blocks ─────────────────── */
+.card {
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-2);
+  position: relative;
+}
+
+.card-sm {
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-1);
+  position: relative;
+}
+
+.card-outline {
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sq-2);
+  position: relative;
+}
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 11px;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: var(--paper);
+  box-shadow: var(--sh-1);
+  font-family: var(--font-ui);
+  font-size: 12.5px; font-weight: 700;
+  letter-spacing: 0;
+  color: var(--ink);
+}
+
+.squish-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 13px 18px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  background: var(--hi);
+  color: var(--line);
+  font-family: var(--font-ui);
+  font-weight: 800;
+  font-size: 14.5px;
+  box-shadow: var(--sq-2);
+  cursor: pointer;
+  transition: transform .08s, box-shadow .08s;
+  user-select: none;
+}
+.squish-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--line); }
+.squish-btn.accent { background: var(--accent); color: #fff; }
+.squish-btn.ghost  { background: var(--paper); }
+.squish-btn.plum   { background: var(--plum); color: #fff; }
+
+/* corner tape — sticker vibe */
+.tape {
+  position: absolute;
+  width: 46px; height: 16px;
+  background: rgba(255, 204, 102, .75);
+  border: 1px solid rgba(0,0,0,.15);
+  box-shadow: 0 2px 4px rgba(0,0,0,.08);
+}
+
+/* sticker — thick outline badge */
+.sticker {
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 2.5px solid var(--line);
+  border-radius: 50%;
+  box-shadow: var(--sq-2);
+  background: var(--paper);
+}
+
+/* hide scrollbars inside scroll regions */
+.hide-scroll { scrollbar-width: none; }
+.hide-scroll::-webkit-scrollbar { display: none; }
+
+/* wobble — used for celebrations */
+@keyframes wobble {
+  0%,100% { transform: rotate(0); }
+  25% { transform: rotate(-3deg) scale(1.02); }
+  75% { transform: rotate(3deg) scale(1.02); }
+}
+.wobble { animation: wobble 1.2s ease-in-out infinite; }
+
+@keyframes pop {
+  0% { transform: scale(.6); opacity: 0; }
+  60% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.pop { animation: pop .4s cubic-bezier(.2,.8,.3,1.2) both; }
+
+@keyframes breathe {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+.breathe { animation: breathe 3s ease-in-out infinite; }
+
+/* divider — dashed, playful */
+.dash {
+  border: none;
+  border-top: 2px dashed var(--line);
+  opacity: .35;
+  margin: 0;
+}

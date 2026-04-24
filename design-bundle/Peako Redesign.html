@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>peako — redesign v2</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800&family=Nunito:wght@600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles/peako.css">
+
+<style>
+  html, body { height: 100%; background: #0e0c0a; }
+  body { overflow: hidden; }
+  #canvas-root { width: 100vw; height: 100vh; }
+</style>
+</head>
+<body>
+
+<div id="canvas-root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="frames/ios-frame.jsx"></script>
+<script type="text/babel" src="frames/design-canvas.jsx"></script>
+<script type="text/babel" src="components/mascot.jsx"></script>
+<script type="text/babel" src="components/ui.jsx"></script>
+<script type="text/babel" src="components/feed.jsx"></script>
+<script type="text/babel" src="components/today.jsx"></script>
+<script type="text/babel" src="components/progress.jsx"></script>
+<script type="text/babel" src="components/you.jsx"></script>
+<script type="text/babel" src="components/you-c.jsx"></script>
+
+<script>
+  window.PEAKO_TWEAKS = /*EDITMODE-BEGIN*/{
+    "dayState": "fresh",
+    "mood": "deadpan",
+    "growthDay": 7,
+    "idleVariant": "gorogoro"
+  }/*EDITMODE-END*/;
+</script>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+function PeakoApp({ tweaks }) {
+  const [tab, setTab] = useState('today');
+  return (
+    <div style={{ position: 'absolute', inset: 0, background: 'var(--bg)', overflow: 'hidden' }}>
+      <IOSStatusBar time="9:41" />
+      <div style={{ position: 'absolute', top: 54, left: 0, right: 0, bottom: 0 }}>
+        {tab === 'today'    && <TodayScreen dayState={tweaks.dayState} mood={tweaks.mood} growthDay={tweaks.growthDay} idleVariant={tweaks.idleVariant}/>}
+        {tab === 'progress' && <ProgressScreen growthDay={tweaks.growthDay}/>}
+        {tab === 'you'      && <YouScreen growthDay={tweaks.growthDay}/>}
+      </div>
+      <PeakoTabBar tab={tab} onTab={setTab} />
+    </div>
+  );
+}
+
+function PhoneFrame({ children }) {
+  return (
+    <IOSDevice style={{ boxShadow: '0 20px 40px rgba(0,0,0,.25), 0 40px 80px rgba(0,0,0,.18)' }}>
+      {children}
+    </IOSDevice>
+  );
+}
+
+function SingleScreen({ tweaks, screen, youVariant }) {
+  const YouVar = youVariant === 'c' ? YouC : YouScreen;
+  return (
+    <div style={{ position: 'absolute', inset: 0, background: 'var(--bg)', overflow: 'hidden' }}>
+      <IOSStatusBar time="9:41"/>
+      <div style={{ position: 'absolute', top: 54, left: 0, right: 0, bottom: 0 }}>
+        {screen === 'today'    && <TodayScreen dayState={tweaks.dayState} mood={tweaks.mood} growthDay={tweaks.growthDay} idleVariant={tweaks.idleVariant}/>}
+        {screen === 'progress' && <ProgressScreen growthDay={tweaks.growthDay}/>}
+        {screen === 'you'      && <YouVar growthDay={tweaks.growthDay}/>}
+      </div>
+      <PeakoTabBar tab={screen} onTab={()=>{}} />
+    </div>
+  );
+}
+
+// Mascot state showcase — contextual mascot reactions
+function MascotStates() {
+  const states = [
+    { s: 'on-phone', name: 'On phone',  desc: 'Just posted about you' },
+    { s: 'idle',     name: 'Idle',      desc: 'Default smug' },
+    { s: 'side-eye', name: 'Side-eye',  desc: 'You\'ve been scrolling' },
+    { s: 'staring',  name: 'Staring',   desc: 'Day\'s almost over' },
+    { s: 'sleepy',   name: 'Sleepy',    desc: 'After hours' },
+  ];
+  return (
+    <div style={{ position: 'absolute', inset: 0, background: 'var(--bg)', padding: 20, overflow: 'auto' }}>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 700, letterSpacing: '-.02em' }}>
+        Peako · states
+      </div>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--ink-3)', letterSpacing: '.12em', marginBottom: 14, marginTop: 4 }}>
+        CONTEXTUAL · DRIVEN BY DAY STATE
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        {states.map(x => (
+          <div key={x.s} className="card-sm" style={{ padding: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+            <Mascot state={x.s} size={94}/>
+            <div style={{ fontWeight: 800, fontSize: 13, marginTop: 4 }}>{x.name}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--ink-3)', textAlign: 'center' }}>{x.desc}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function DesignNotes() {
+  return (
+    <div style={{ position: 'absolute', inset: 0, padding: 22, overflow: 'auto', background: 'var(--bg)' }}>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, letterSpacing: '-.02em' }}>What changed · v2</div>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--ink-3)', letterSpacing: '.1em', marginTop: 4, marginBottom: 14 }}>PEAKO-CENTERED · CALMER TYPE</div>
+      {[
+        { h: 'Peako is the app.',
+          b: 'Giant mascot holding a phone is the Today hero. The phone is tappable and the real action — it opens Peako\'s Feed.' },
+        { h: 'The Feed is new.',
+          b: 'Every user action (log, quest, skip) becomes a Peako post. Twitter-style timeline, cute-but-snarky voice, reactions, pinned.' },
+        { h: 'Mascot is contextual.',
+          b: 'On-phone when Peako just posted. Staring when the day is almost over and you\'ve done nothing. Side-eye mid-scroll. Sleepy after hours.' },
+        { h: 'Calmer, more readable.',
+          b: 'Dropped stickerpack chrome, tape corners, grain. Hairline borders + soft shadows on most cards. Sticker accents reserved for moments that deserve celebration (ID card, sticker book, saved notes).' },
+        { h: 'Voice: 腹黑.',
+          b: 'Sounds cute and brief. Reads savage on second pass. "okay. just posted something about you." "i saw that. we don\'t have to talk about it."' },
+        { h: 'Tweaks',
+          b: 'Day state (fresh / idle / staring / celebrating) · Roast demo · Progress hero.' },
+      ].map((n, i) => (
+        <div key={i} className="card-sm" style={{ padding: 12, marginBottom: 10 }}>
+          <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 3 }}>{n.h}</div>
+          <div style={{ fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.4, fontWeight: 600 }}>{n.b}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function TweaksPanel({ tweaks, setTweaks, onClose }) {
+  const set = (k, v) => {
+    const next = { ...tweaks, [k]: v };
+    setTweaks(next);
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [k]: v } }, '*');
+  };
+  return (
+    <div style={{
+      position: 'fixed', right: 20, bottom: 20, width: 320,
+      background: '#fff', color: '#1f1d1b',
+      border: '1.5px solid #1f1d1b', borderRadius: 18,
+      boxShadow: '0 6px 0 #1f1d1b, 0 20px 40px rgba(0,0,0,.3)',
+      padding: 14, fontFamily: 'Nunito, system-ui, sans-serif', zIndex: 10000,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
+        <div style={{ fontFamily: 'Fraunces, serif', fontSize: 20, fontWeight: 700 }}>Tweaks</div>
+        <div style={{ flex: 1 }}/>
+        <button onClick={onClose} style={{
+          border: '1.5px solid #1f1d1b', background: '#fff',
+          width: 28, height: 28, borderRadius: 8, cursor: 'pointer', fontWeight: 800,
+          boxShadow: '0 2px 0 #1f1d1b',
+        }}>×</button>
+      </div>
+
+      <TweakRow label="DAY STATE · drives Peako">
+        {[['fresh','Fresh'],['idle','Idle'],['staring','Staring'],['celebrating','Done']].map(([v,l]) => (
+          <TweakOpt key={v} active={tweaks.dayState === v} onClick={() => set('dayState', v)}>{l}</TweakOpt>
+        ))}
+      </TweakRow>
+
+      <TweakRow label="MOOD · glyph + rare bubble palette">
+        {[['sweet','Sweet'],['deadpan','Deadpan'],['gremlin','Gremlin']].map(([v,l]) => (
+          <TweakOpt key={v} active={tweaks.mood === v} onClick={() => set('mood', v)}>{l}</TweakOpt>
+        ))}
+      </TweakRow>
+
+      <TweakRow label="IDLE POSE (phone aside)">
+        {[['gorogoro','Sprawl'],['loaf','Loaf'],['popcorn','Watch'],['plotting','Plot']].map(([v,l]) => (
+          <TweakOpt key={v} active={tweaks.idleVariant === v} onClick={() => set('idleVariant', v)}>{l}</TweakOpt>
+        ))}
+      </TweakRow>
+
+      <TweakRow label="PEAKO'S GROWTH · DAY">
+        {[['0','0'],['4','4'],['7','7'],['12','12'],['17','17'],['21','21'],['28','28+']].map(([v,l]) => (
+          <TweakOpt key={v} active={String(tweaks.growthDay) === v} onClick={() => set('growthDay', Number(v))}>{l}</TweakOpt>
+        ))}
+      </TweakRow>
+
+      <div style={{ marginTop: 12, fontSize: 11, color: '#888', fontFamily: 'JetBrains Mono', lineHeight: 1.35 }}>
+        Growth Day drives Peako's stage (seed→sprout→teen→grown) and the Trail's "you are here" node. Tap Peako's diary on the desk in Today.
+      </div>
+    </div>
+  );
+}
+
+function TweakRow({ label, children }) {
+  return (
+    <div style={{ marginBottom: 10 }}>
+      <div style={{ fontFamily: 'JetBrains Mono', fontSize: 10, fontWeight: 800, letterSpacing: '.12em', color: '#666', marginBottom: 5 }}>{label}</div>
+      <div style={{ display: 'flex', gap: 4 }}>{children}</div>
+    </div>
+  );
+}
+function TweakOpt({ active, children, onClick }) {
+  return (
+    <button onClick={onClick} style={{
+      flex: 1, padding: '6px 6px',
+      border: '1.5px solid #1f1d1b',
+      background: active ? '#8bd48f' : '#fff',
+      borderRadius: 10, boxShadow: '0 2px 0 #1f1d1b',
+      fontFamily: 'Nunito', fontWeight: 800, fontSize: 12,
+      cursor: 'pointer', color: '#1f1d1b',
+    }}>{children}</button>
+  );
+}
+
+// Peako growth lineup — 4 stages side-by-side
+// Peako lounge poses + posting scene — side-by-side
+function LoungeLineup() {
+  const items = [
+    { key: 'posting',  label: 'POSTING',   desc: '"holds phone · actively typing"' },
+    { key: 'gorogoro', label: 'GOROGORO',  desc: '"sprawled · phone tossed aside"' },
+    { key: 'loaf',     label: 'LOAF',      desc: '"bread pose · phone face-down"' },
+    { key: 'popcorn',  label: 'WATCHING',  desc: '"propped up · ignoring phone"' },
+    { key: 'plotting', label: 'PLOTTING',  desc: '"curled, side-eye · phone just out of reach"' },
+  ];
+  return (
+    <div style={{ position: 'absolute', inset: 0, background: 'var(--bg)', padding: 20, overflow: 'auto' }}>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, letterSpacing: '-.02em' }}>
+        Peako · lounge poses
+      </div>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--ink-3)', letterSpacing: '.12em', marginBottom: 14, marginTop: 4 }}>
+        PHONE ONLY IN HAND WHEN POSTING
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <SceneKeyframes/>
+        {items.map(x => (
+          <div key={x.key} className="card-sm" style={{
+            padding: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+            overflow: 'hidden',
+          }}>
+            <div style={{ width: 160, height: 160, position: 'relative' }}>
+              {x.key === 'posting' ? (
+                <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
+                  <PeakoPosting size={150} stage="grown" draft="posting..." unread={3}/>
+                </div>
+              ) : (
+                <PeakoLounging size={160} variant={x.key} stage="grown" mascotState="idle" unread={2}/>
+              )}
+            </div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: 10.5, letterSpacing: '.08em', marginTop: 4 }}>{x.label}</div>
+            <div style={{ fontSize: 10.5, color: 'var(--ink-2)', fontStyle: 'italic', fontFamily: 'var(--font-display)', textAlign: 'center', lineHeight: 1.3 }}>{x.desc}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function GrowthLineup() {
+  const stages = [
+    { key: 'seed',   day: 'Day 0',   desc: 'barely here' },
+    { key: 'sprout', day: 'Day 7',   desc: 'small victories' },
+    { key: 'teen',   day: 'Day 14',  desc: 'forming a spine' },
+    { key: 'grown',  day: 'Day 21',  desc: 'unbothered' },
+  ];
+  return (
+    <div style={{ position: 'absolute', inset: 0, background: 'var(--bg)', padding: 20, overflow: 'auto' }}>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, letterSpacing: '-.02em' }}>
+        Peako · growth
+      </div>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--ink-3)', letterSpacing: '.12em', marginBottom: 14, marginTop: 4 }}>
+        MILESTONE-GATED · SAME CHARACTER
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        {stages.map(x => (
+          <div key={x.key} className="card-sm" style={{ padding: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+            <Mascot state="idle" size={96} stage={x.key}/>
+            <div style={{ fontWeight: 800, fontSize: 13, marginTop: 4, textTransform: 'capitalize' }}>{x.key}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--ink-3)', letterSpacing: '.08em' }}>{x.day.toUpperCase()}</div>
+            <div style={{ fontSize: 11, color: 'var(--ink-2)', fontStyle: 'italic', fontFamily: 'var(--font-display)', textAlign: 'center' }}>"{x.desc}"</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Root() {
+  const [tweaks, setTweaks] = useState(window.PEAKO_TWEAKS);
+  const [editOpen, setEditOpen] = useState(false);
+  useEffect(() => {
+    const handler = (e) => {
+      if (!e.data) return;
+      if (e.data.type === '__activate_edit_mode')   setEditOpen(true);
+      if (e.data.type === '__deactivate_edit_mode') setEditOpen(false);
+    };
+    window.addEventListener('message', handler);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', handler);
+  }, []);
+
+  return (
+    <>
+      <DesignCanvas>
+        <DCSection id="prototype" title="PROTOTYPE" subtitle="Tap tabs. Tap Peako's phone to open the feed.">
+          <DCArtboard id="full-app" label="Full app · live" width={390} height={844}>
+            <PhoneFrame><PeakoApp tweaks={tweaks} /></PhoneFrame>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="today-states" title="TODAY · PEAKO STATES" subtitle="Peako only holds the phone when posting. Otherwise — phone on the floor, Peako gorogoro-ing.">
+          <DCArtboard id="t-fresh"       label="Posting · holds phone"   width={390} height={844}>
+            <PhoneFrame><SingleScreen tweaks={{ ...tweaks, dayState: 'fresh' }} screen="today"/></PhoneFrame>
+          </DCArtboard>
+          <DCArtboard id="t-idle"        label="Gorogoro · sprawled"         width={390} height={844}>
+            <PhoneFrame><SingleScreen tweaks={{ ...tweaks, dayState: 'idle' }} screen="today"/></PhoneFrame>
+          </DCArtboard>
+          <DCArtboard id="t-staring"     label="Plotting · side-eye"   width={390} height={844}>
+            <PhoneFrame><SingleScreen tweaks={{ ...tweaks, dayState: 'staring' }} screen="today"/></PhoneFrame>
+          </DCArtboard>
+          <DCArtboard id="t-celebrating" label="Watching · 3/3 done" width={390} height={844}>
+            <PhoneFrame><SingleScreen tweaks={{ ...tweaks, dayState: 'celebrating' }} screen="today"/></PhoneFrame>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="lounge-poses" title="PEAKO · LOUNGE POSES" subtitle="Phone thrown aside. Pose cycles when Peako is idle.">
+          <DCArtboard id="lounge-lineup" label="All 4 poses + posting" width={460} height={420}>
+            <LoungeLineup/>
+          </DCArtboard>
+          <DCArtboard id="l-gorogoro" label="Idle · Gorogoro"   width={390} height={844}>
+            <PhoneFrame><SingleScreen tweaks={{ ...tweaks, dayState: 'idle', idleVariant: 'gorogoro' }} screen="today"/></PhoneFrame>
+          </DCArtboard>
+          <DCArtboard id="l-loaf" label="Idle · Loaf"            width={390} height={844}>
+            <PhoneFrame><SingleScreen tweaks={{ ...tweaks, dayState: 'idle', idleVariant: 'loaf' }} screen="today"/></PhoneFrame>
+          </DCArtboard>
+          <DCArtboard id="l-popcorn" label="Idle · Popcorn"      width={390} height={844}>
+            <PhoneFrame><SingleScreen tweaks={{ ...tweaks, dayState: 'idle', idleVariant: 'popcorn' }} screen="today"/></PhoneFrame>
+          </DCArtboard>
+          <DCArtboard id="l-plotting" label="Idle · Plotting"    width={390} height={844}>
+            <PhoneFrame><SingleScreen tweaks={{ ...tweaks, dayState: 'idle', idleVariant: 'plotting' }} screen="today"/></PhoneFrame>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="screens" title="PROGRESS & YOU" subtitle="Redesigned tabs, calmer type.">
+          <DCArtboard id="progress" label="Progress" width={390} height={844}>
+            <PhoneFrame><SingleScreen tweaks={tweaks} screen="progress"/></PhoneFrame>
+          </DCArtboard>
+          <DCArtboard id="you" label="You · v2 (current)" width={390} height={844}>
+            <PhoneFrame><SingleScreen tweaks={tweaks} screen="you"/></PhoneFrame>
+          </DCArtboard>
+          <DCArtboard id="you-c" label="You · v3 (settings-focused)" width={390} height={844}>
+            <PhoneFrame><SingleScreen tweaks={tweaks} screen="you" youVariant="c"/></PhoneFrame>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="progress-growth" title="PROGRESS · GROWTH STATES" subtitle="Same tab, different days. Trail is the record; day/week zoom for different reading modes.">
+          <DCArtboard id="p-seed"   label="Day 0 · Seed (start)" width={390} height={844}>
+            <PhoneFrame><SingleScreen tweaks={{ ...tweaks, growthDay: 0  }} screen="progress"/></PhoneFrame>
+          </DCArtboard>
+          <DCArtboard id="p-sprout" label="Day 7 · Sprout"       width={390} height={844}>
+            <PhoneFrame><SingleScreen tweaks={{ ...tweaks, growthDay: 7  }} screen="progress"/></PhoneFrame>
+          </DCArtboard>
+          <DCArtboard id="p-teen"   label="Day 14 · Teen"        width={390} height={844}>
+            <PhoneFrame><SingleScreen tweaks={{ ...tweaks, growthDay: 14 }} screen="progress"/></PhoneFrame>
+          </DCArtboard>
+          <DCArtboard id="p-grown" label="Day 21 · Grown" width={390} height={844}>
+            <PhoneFrame><SingleScreen tweaks={{ ...tweaks, growthDay: 21 }} screen="progress"/></PhoneFrame>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="peako-growth" title="PEAKO · GROWTH STAGES" subtitle="Milestone-gated. Same character, evolved.">
+          <DCArtboard id="growth-lineup" label="Lineup · seed → grown" width={420} height={420}>
+            <GrowthLineup/>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="peako" title="PEAKO · CHARACTER" subtitle="Mascot state set + design notes.">
+          <DCArtboard id="states" label="State set" width={420} height={620}>
+            <MascotStates/>
+          </DCArtboard>
+          <DCArtboard id="notes" label="Design notes" width={360} height={620}>
+            <DesignNotes/>
+          </DCArtboard>
+        </DCSection>
+      </DesignCanvas>
+
+      {editOpen && <TweaksPanel tweaks={tweaks} setTweaks={setTweaks} onClose={() => setEditOpen(false)}/>}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('canvas-root')).render(<Root/>);
+</script>
+</body>
+</html>
