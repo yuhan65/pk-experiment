@@ -1,0 +1,93 @@
+---
+description: How to write/update product knowledge notes in docs/ (Obsidian vault) for the Peako app
+alwaysApply: true
+---
+
+# Obsidian Notes Protocol
+
+The folder `docs/` is an Obsidian Vault. When the user says any of the following, follow this protocol exactly. Do not invent alternative structures.
+
+**Triggers for "organize this session into obsidian" (run the full workflow below):**
+- Chinese: **"归档"**, "归一下", "整理到 obsidian", "更新 obsidian"
+- English: **"obs"**, "obs it", "update obsidian", "write a journal entry"
+
+**Triggers for "scan code and extract logic":**
+- "扫一下 `<file>`", "extract logic from `<file>`", "拆 `<file>` 的逻辑到 Logic"
+
+Note: do NOT interpret the word **"log"** (English) as a trigger — it's a first-class feature name in this app (Log Salad / Log Pizza / Log Gym) and means something entirely different. Only the shortcuts listed above count.
+
+## Folder map
+
+```
+docs/
+├── _Index.md              # MOC — do not overwrite, only add links if structure changes
+├── Logic/                 # one note per product-logic rule (the core of the vault)
+├── Decisions/             # ADRs — one note per hard call
+├── Journal/               # one note per Cursor session, named YYYY-MM-DD-<slug>.md
+├── Templates/             # Logic.md, Decision.md, Journal.md — copy these, never edit
+└── Peako_*.md             # legacy long-form docs; link but don't fragment
+```
+
+## Writing rules
+
+### 1. Every Logic note MUST use `Templates/Logic.md` frontmatter fields
+Required frontmatter: `type: logic`, `status`, `tags`, `last_reviewed`, `related`.
+Body sections, in this order: **Why → Trigger → Rule → Outputs & side effects → Edge cases → Depends on / Affects → Open questions → Code / UI anchors → Changelog**.
+
+- *Why* is 1–3 sentences tied to user value, not engineering.
+- *Rule* MUST be unambiguous — prefer `IF / AND / THEN / ELSE` blocks or a truth table. No prose-only rules.
+- *Code anchors* use `src/FileName.jsx` L<start>–L<end>.
+
+### 2. Every Decision note MUST use `Templates/Decision.md`
+Use ADR format. Decisions never get deleted; when superseded, mark `status: superseded` and link to the new one.
+
+### 3. Journal entry at end of each session
+Filename: `docs/Journal/YYYY-MM-DD-<kebab-slug>.md`. Use `Templates/Journal.md`. Slug describes the session focus, e.g. `2026-04-22-extract-core-logic.md`.
+
+The journal MUST:
+- Link every Logic / Decision note touched in that session via `[[…]]`.
+- Put unresolved items in *Open threads* as `- [ ] …` so they show up in `_Index.md`'s task query.
+
+### 4. Cross-linking is mandatory
+- A new Logic note linked from `Peako_App_Structure.md` or `Peako_Design_Brief.md` → add a one-line mention with `[[Logic/Your-Note]]` where relevant. This keeps the graph connected; without it nothing shows up in Graph view.
+- Use Obsidian wikilinks `[[Logic/Streak-Preservation]]`, not relative markdown paths.
+
+### 5. Tags convention
+- `#logic` on every Logic note, plus a feature tag like `#feature/feed`, `#feature/challenge`, `#feature/log`, `#feature/progress`.
+- `#decision` on every Decision note.
+- `#journal` on every Journal note.
+- Avoid free-form tags — pick from existing ones unless the user explicitly adds a new category.
+
+### 6. Never touch
+- `docs/_Index.md` — only add links when a whole new folder/category appears. Dataview queries update automatically.
+- `docs/Templates/*` — templates are read-only references; copy them, don't edit in place.
+- Legacy `docs/Peako_*.md` — preserve as-is; new info goes into `Logic/` / `Decisions/` and links back.
+
+## The "整理到 obsidian" workflow
+
+When asked to organize a session, run this sequence:
+
+1. **Scan the conversation** for: (a) new/changed product rules, (b) decisions made or opened, (c) code changes touching logic.
+2. **For each piece of product logic** touched, either create a new `Logic/<Name>.md` from the template, or update the existing one (bump `last_reviewed`, append a changelog line).
+3. **For each hard call** that was made or deferred, create/update `Decisions/ADR-<n>-<slug>.md`.
+4. **Write one Journal entry** `Journal/YYYY-MM-DD-<slug>.md` summarizing the session and linking everything touched.
+5. **Report back**: tell the user exactly which files were created/modified with a one-line reason each.
+
+## The "extract logic from <file>" workflow
+
+When asked to scan code and extract logic:
+
+1. Read the target file end-to-end.
+2. Identify each decision point / branch / magic number / ruleset (e.g. a `switch`, a reward table, a state transition, a time-based rule). Each one becomes one Logic note.
+3. Do NOT document pure presentational code (animations, CSS, layout) as Logic. Logic = rules that affect product behavior.
+4. For each, fill in *Why* by inferring user-facing impact; if uncertain, write `TODO: confirm with PM` and leave `status: draft`.
+5. Cross-link: if two logics share inputs/outputs, add each to the other's `Depends on / Affects`.
+6. End with a Journal entry summarizing what was extracted.
+
+## Examples of well-scoped Logic notes
+
+- ✅ `Logic/Coin-Reward-Rule.md` — "pizza earns 2 coins, others earn 10" (a rule with user impact)
+- ✅ `Logic/Streak-Preservation.md` — "what keeps a streak alive" (a product rule)
+- ✅ `Logic/Challenge-Sequencing.md` — "can user tap challenge 2 before finishing 1" (an IA rule)
+- ❌ `Logic/PostCard-Animation.md` — presentational, belongs in design brief, not Logic
+- ❌ `Logic/useState-setup.md` — implementation trivia, not a product rule

@@ -1,0 +1,222 @@
+{
+  "main": {
+    "id": "6fbc8551010dba1a",
+    "type": "split",
+    "children": [
+      {
+        "id": "02c28498a07239ef",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "da1497363a201694",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Decisions/ADR-004-Streak-Preservation-Threshold.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "ADR-004-Streak-Preservation-Threshold"
+            }
+          },
+          {
+            "id": "bac2139e60d7a64e",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Logic/Log-to-Feed-Flow.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Log-to-Feed-Flow"
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "8436f021b649f1b3",
+    "type": "split",
+    "children": [
+      {
+        "id": "b4f515fed4f4332a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "c84c970604729d52",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "f21a8f2f9424d72e",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "abeaafd8063090a5",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "11e73dcf4693f90b",
+    "type": "split",
+    "children": [
+      {
+        "id": "e3644eeb208391c0",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "fd7fd57606a02712",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Logic/Log-to-Feed-Flow.md",
+                "collapseAll": true,
+                "extraContext": true,
+                "sortOrder": "alphabetical",
+                "showSearch": true,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for Log-to-Feed-Flow"
+            }
+          },
+          {
+            "id": "8e466a0572bfcb7e",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Journal/2026-04-22-streak-and-currency-simplification.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from 2026-04-22-streak-and-currency-simplification"
+            }
+          },
+          {
+            "id": "e9c4e69fce9fdbf1",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "c0da681cb79d10b3",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "3e9c2653c8d6fca1",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Journal/2026-04-22-streak-and-currency-simplification.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of 2026-04-22-streak-and-currency-simplification"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false,
+      "templater-obsidian:Templater": false
+    }
+  },
+  "active": "bac2139e60d7a64e",
+  "lastOpenFiles": [
+    "Logic/Peako-Brain-Scripting.md",
+    "Journal/2026-04-22-streak-and-currency-simplification.md",
+    "Journal/2026-04-22-obsidian-vault-setup.md",
+    "Logic/Coin-Reward-Rule.md",
+    "note for myself.md",
+    "Decisions/ADR-004-Streak-Preservation-Threshold.md",
+    "Templates/Decision.md",
+    "Logic/Streak-Preservation.md",
+    "Logic/Peako-Growth-Stages.md",
+    "Decisions/ADR-008-Peako-Growth-System-Dual-Progress-Views.md",
+    "Peako_Product_Doc_CN.md",
+    "Peako_产品文档_内部版.md",
+    "Decisions/ADR-007-MVP-Batch-Lock-2026-04-23.md",
+    "Decisions/ADR-006-Internal-Demo-Scope.md",
+    "Logic/Log-to-Feed-Flow.md",
+    "Decisions/ADR-005-Streak-And-Currency-Count.md",
+    "Peako_Alternatives.md"
+  ]
+}
